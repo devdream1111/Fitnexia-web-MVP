@@ -17,8 +17,8 @@ export function ClassCard({ item, compact, showEdit, editHref }: {
 }) {
   const full = item.spotsLeft === 0;
   const CardContent = () => (
-    <div className="flex flex-col gap-4 rounded-2xl bg-[var(--fn-surface)] p-6 shadow-sm transition-all md:flex-row">
-      <div className="flex h-28 w-full shrink-0 items-center justify-center rounded-2xl bg-[var(--fn-primary-muted)] md:w-28">
+    <div className="flex flex-col gap-4 rounded-2xl bg-[var(--fn-surface)] p-6 shadow-sm transition-all md:flex-row hover:shadow-lg">
+      <div className="flex h-28 w-full shrink-0 items-center justify-center rounded-2xl bg-[var(--fn-primary-muted)] md:w-28 animate-float" style={{ animationDelay: '0.1s' }}>
         <Dumbbell size={36} className="text-[var(--fn-primary)]" />
       </div>
       <div className="min-w-0 flex-1 space-y-2">
@@ -28,7 +28,7 @@ export function ClassCard({ item, compact, showEdit, editHref }: {
             {full ? <Badge label={BADGE_LABELS.full} variant="warning" /> : null}
             {showEdit && editHref ? (
               <Link href={editHref} onClick={(e) => e.stopPropagation()}>
-                <Button variant="outline" size="sm" title="Edit">
+                <Button variant="outline" size="sm" title="Edit" className="hover:animate-pulse-glow">
                   <Edit3 size={16} className="mr-1" /> Edit
                 </Button>
               </Link>

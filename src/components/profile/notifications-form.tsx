@@ -3,6 +3,7 @@
 import { useAuth, DEFAULT_NOTIFICATIONS } from '@/contexts/auth-context';
 import { isNotificationPrefVisible } from '@/constants/features';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { BUTTON_LABELS } from '@/constants/labels';
 
 const PREFS: { key: keyof typeof DEFAULT_NOTIFICATIONS; label: string }[] = [
@@ -24,14 +25,14 @@ export function NotificationsForm() {
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {PREFS.filter((p) => isNotificationPrefVisible(p.key)).map((p) => (
-        <label
+        <Checkbox
           key={p.key}
-          className="flex cursor-pointer items-center justify-between rounded-xl border border-[var(--fn-border)] bg-[var(--fn-surface)] px-4 py-3">
-          <span>{p.label}</span>
-          <input type="checkbox" checked={prefs[p.key]} onChange={() => toggle(p.key)} />
-        </label>
+          label={p.label}
+          checked={prefs[p.key]}
+          onChange={() => toggle(p.key)}
+        />
       ))}
       <Button title={BUTTON_LABELS.save} className="mt-4" onClick={() => alert('Preferences saved (mock)')} />
     </div>

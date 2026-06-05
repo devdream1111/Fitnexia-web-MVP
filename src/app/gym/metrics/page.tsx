@@ -1,48 +1,86 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useClasses } from '@/contexts/classes-context';
 import { getGymMetrics, formatAttendanceRate, formatGymChange, formatRevenueCompact } from '@/utils/gym-metrics';
 import { getLinkedInstitutionId } from '@/utils/institution';
 
+type ActiveChart = 'bookings' | 'revenue' | 'attendance' | null;
+
 export default function GymMetricsPage() {
   const { user } = useAuth();
   const { classes } = useClasses();
   const metrics = getGymMetrics(getLinkedInstitutionId(user), classes);
+  const [activeChart, setActiveChart] = useState<ActiveChart>('bookings');
 
   return (
     <div>
       <h1 className="text-3xl font-extrabold">Metrics</h1>
       <p className="text-[var(--fn-text-muted)]">This week</p>
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <MetricCard label="Bookings" value={String(metrics.bookings)} change={formatGymChange(metrics.bookingsChangePct)} />
-        <MetricCard label="Revenue" value={formatRevenueCompact(metrics.revenueCents)} change={formatGymChange(metrics.revenueChangePct)} />
-        <MetricCard label="Attendance" value={formatAttendanceRate(metrics.attendanceRate)} change={formatGymChange(metrics.attendanceChangePct)} />
+        <MetricCard
+          label="Bookings"
+          value={String(metrics.bookings)}
+          change={formatGymChange(metrics.bookingsChangePct)}
+          active={activeChart === 'bookings'}
+          onClick={() => setActiveChart(activeChart === 'bookings' ? null : 'bookings')}
+        />
+        <MetricCard
+          label="Revenue"
+          value={formatRevenueCompact(metrics.revenueCents)}
+          change={formatGymChange(metrics.revenueChangePct)}
+          active={activeChart === 'revenue'}
+          onClick={() => setActiveChart(activeChart === 'revenue' ? null : 'revenue')}
+        />
+        <MetricCard
+          label="Attendance"
+          value={formatAttendanceRate(metrics.attendanceRate)}
+          change={formatGymChange(metrics.attendanceChangePct)}
+          active={activeChart === 'attendance'}
+          onClick={() => setActiveChart(activeChart === 'attendance' ? null : 'attendance')}
+        />
       </div>
       
-      <div className="mt-8 grid gap-6">
-        <div className="rounded-2xl bg-[var(--fn-surface)] p-6">
-          <p className="text-lg font-bold mb-4">Daily Bookings</p>
-          <LineChart data={metrics.daily} dataKey="bookings" />
-        </div>
-
-        <div className="rounded-2xl bg-[var(--fn-surface)] p-6">
-          <p className="text-lg font-bold mb-4">Daily Revenue</p>
-          <BarChart data={metrics.daily} dataKey="revenueCents" />
-        </div>
-
-        <div className="rounded-2xl bg-[var(--fn-surface)] p-6">
-          <p className="text-lg font-bold mb-4">Attendance Overview</p>
-          <PieChart attendanceRate={metrics.attendanceRate} />
-        </div>
+      <div className="mt-8">
+        {activeChart === 'bookings' && (
+          <div className="rounded-2xl bg-[var(--fn-surface)] p-6">
+            <p className="text-lg font-bold mb-4">Daily Bookings</p>
+            <LineChart data={metrics.daily} dataKey="bookings" />
+          </div>
+        )}
+        {activeChart === 'revenue' && (
+          <div className="rounded-2xl bg-[var(--fn-surface)] p-6">
+            <p className="text-lg font-bold mb-4">Daily Revenue</p>
+            <BarChart data={metrics.daily} dataKey="revenueCents" />
+          </div>
+        )}
+        {activeChart === 'attendance' && (
+          <div className="rounded-2xl bg-[var(--fn-surface)] p-6">
+            <p className="text-lg font-bold mb-4">Attendance Overview</p>
+            <PieChart attendanceRate={metrics.attendanceRate} />
+          </div>
+        )}
+        {activeChart === null && (
+          <div className="rounded-2xl border border-dashed border-[var(--fn-border)] p-12 text-center">
+            <p className="text-[var(--fn-text-muted)]">Click on a metric card above to view the chart</p>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-function MetricCard({ label, value, change }: { label: string; value: string; change: string }) {
+function MetricCard({ label, value, change, active, onClick }: { label: string; value: string; change: string; active: boolean; onClick: () => void }) {
   return (
-    <div className="rounded-2xl bg-[var(--fn-surface)] p-4">
+    <div
+      className={`rounded-2xl p-4 cursor-pointer transition-all ${
+        active
+          ? 'bg-[var(--fn-primary-muted)] border-2 border-[var(--fn-primary)]'
+          : 'bg-[var(--fn-surface)] border-2 border-transparent hover:border-[var(--fn-primary-muted)]'
+      }`}
+      onClick={onClick}
+    >
       <p className="text-sm text-[var(--fn-text-muted)]">{label}</p>
       <p className="text-2xl font-extrabold">{value}</p>
       <p className="text-xs text-[var(--fn-success)]">{change}</p>

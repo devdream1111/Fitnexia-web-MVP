@@ -64,117 +64,124 @@ export default function GymProfilePage() {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-extrabold">{SCREEN_TITLES.gymProfile}</h1>
-        {!isEditing ? (
-          <button
-            type="button"
-            onClick={() => setIsEditing(true)}
-            className="font-semibold text-[var(--fn-primary)] transition hover:opacity-80"
-          >
-            {BUTTON_LABELS.edit}
-          </button>
-        ) : (
-          <div className="flex gap-3">
-            <Button title="Cancel" variant="outline" onClick={handleCancel} />
-            <Button title="Save" onClick={handleSave} />
-          </div>
-        )}
-      </div>
-
-      <div className="flex flex-col items-start gap-6 md:flex-row md:items-center">
-        <ProfilePictureUpload
-          currentAvatar={user?.avatarUri}
-          onUpload={(uri) => updateProfile({ avatarUri: uri })}
-          role="institution"
-          size="lg"
-        />
-        {isEditing ? (
-          <div className="space-y-4 w-full md:w-auto">
-            <Input label="Gym Name" value={name} onChange={(e) => setName(e.target.value)} />
-            <Input label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          </div>
-        ) : (
-          <div className="space-y-1">
-            <p className="text-2xl font-extrabold">{user?.institutionProfile?.name}</p>
-            <p className="text-base text-[var(--fn-text-muted)]">{user?.email}</p>
-          </div>
-        )}
-      </div>
-
-      {/* Photo Gallery */}
-      <div className="rounded-2xl border border-[var(--fn-border)] bg-[var(--fn-surface)] p-6">
-        <h2 className="mb-4 text-lg font-bold">{PROFILE_MENU_LABELS.photoGallery}</h2>
-        <PhotoGallery
-          images={user?.institutionProfile?.gallery ?? []}
-          onAddImage={(uri) =>
-            updateProfile({
-              institutionProfile: {
-                gallery: [...(user?.institutionProfile?.gallery ?? []), uri],
-              },
-            })
-          }
-          onRemoveImage={(idx) =>
-            updateProfile({
-              institutionProfile: {
-                gallery: (user?.institutionProfile?.gallery ?? []).filter((_, i) => i !== idx),
-              },
-            })
-          }
-        />
-      </div>
-
-      {/* Menu Items */}
-      {!isEditing && (
-        <div className="rounded-2xl border border-[var(--fn-border)] bg-[var(--fn-surface)] overflow-hidden">
-          <ProfileMenuItem href="/gym/profile/instructors" label={PROFILE_MENU_LABELS.instructors} />
-          <ProfileMenuItem href="/gym/profile/plan" label={PROFILE_MENU_LABELS.planCommission} />
-          
-          <div className="p-6 border-t border-[var(--fn-border)]">
-            {!isChangingPassword ? (
-              <button
-                type="button"
-                onClick={() => setIsChangingPassword(true)}
-                className="font-semibold text-[var(--fn-primary)] transition hover:opacity-80"
-              >
-                Change Password
-              </button>
-            ) : (
-              <div className="space-y-4">
-                <Input 
-                  label="Current Password" 
-                  type="password" 
-                  value={currentPassword} 
-                  onChange={(e) => setCurrentPassword(e.target.value)} 
-                />
-                <Input 
-                  label="New Password" 
-                  type="password" 
-                  value={newPassword} 
-                  onChange={(e) => setNewPassword(e.target.value)} 
-                />
-                <Input 
-                  label="Confirm New Password" 
-                  type="password" 
-                  value={confirmPassword} 
-                  onChange={(e) => setConfirmPassword(e.target.value)} 
-                />
-                {passwordError && (
-                  <p className="text-sm text-red-500">{passwordError}</p>
-                )}
-                {passwordSuccess && (
-                  <p className="text-sm text-green-500">{passwordSuccess}</p>
-                )}
-                <div className="flex gap-3">
-                  <Button title="Cancel" variant="outline" onClick={handleCancelPasswordChange} />
-                  <Button title="Change Password" onClick={handleChangePassword} />
-                </div>
-              </div>
-            )}
-          </div>
+    <div className="flex min-h-[79vh] items-center justify-center">
+      <div className="w-full max-w-3xl rounded-2xl bg-[var(--fn-surface)] p-8 shadow-lg">
+        <div className="flex flex-col items-start gap-6 md:flex-row md:items-center mb-8 pb-6 border-b border-[var(--fn-border)]">
+          <ProfilePictureUpload
+            currentAvatar={user?.avatarUri}
+            onUpload={(uri) => updateProfile({ avatarUri: uri })}
+            role="institution"
+            size="lg"
+            editable={isEditing}
+          />
+          {isEditing ? (
+            <div className="space-y-4 w-full md:w-auto">
+              <Input label="Gym Name" value={name} onChange={(e) => setName(e.target.value)} />
+              <Input label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
+          ) : (
+            <div className="space-y-1">
+              <p className="text-2xl font-extrabold">{user?.institutionProfile?.name}</p>
+              <p className="text-base text-[var(--fn-text-muted)]">{user?.email}</p>
+            </div>
+          )}
         </div>
-      )}
+
+        <div className="space-y-6 mb-8">
+          {/* Photo Gallery */}
+          <div className="rounded-2xl border border-[var(--fn-border)] p-6">
+            <h2 className="mb-4 text-lg font-bold">{PROFILE_MENU_LABELS.photoGallery}</h2>
+            <PhotoGallery
+              images={user?.institutionProfile?.gallery ?? []}
+              editable={isEditing}
+              onAddImage={(uri) =>
+                updateProfile({
+                  institutionProfile: {
+                    gallery: [...(user?.institutionProfile?.gallery ?? []), uri],
+                  },
+                })
+              }
+              onRemoveImage={(idx) =>
+                updateProfile({
+                  institutionProfile: {
+                    gallery: (user?.institutionProfile?.gallery ?? []).filter((_, i) => i !== idx),
+                  },
+                })
+              }
+            />
+          </div>
+
+          {/* Menu Items */}
+          {!isEditing && (
+            <div className="rounded-2xl border border-[var(--fn-border)] overflow-hidden">
+              <ProfileMenuItem href="/gym/profile/instructors" label={PROFILE_MENU_LABELS.instructors} />
+              <ProfileMenuItem href="/gym/profile/plan" label={PROFILE_MENU_LABELS.planCommission} />
+              
+              <div className="p-6 border-t border-[var(--fn-border)]">
+                {!isChangingPassword ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsChangingPassword(true)}
+                    className="font-semibold text-[var(--fn-primary)] transition hover:opacity-80"
+                  >
+                    Change Password
+                  </button>
+                ) : (
+                  <div className="space-y-4">
+                    <Input 
+                      label="Current Password" 
+                      type="password" 
+                      value={currentPassword} 
+                      onChange={(e) => setCurrentPassword(e.target.value)} 
+                    />
+                    <Input 
+                      label="New Password" 
+                      type="password" 
+                      value={newPassword} 
+                      onChange={(e) => setNewPassword(e.target.value)} 
+                    />
+                    <Input 
+                      label="Confirm New Password" 
+                      type="password" 
+                      value={confirmPassword} 
+                      onChange={(e) => setConfirmPassword(e.target.value)} 
+                    />
+                    {passwordError && (
+                      <p className="text-sm text-red-500">{passwordError}</p>
+                    )}
+                    {passwordSuccess && (
+                      <p className="text-sm text-green-500">{passwordSuccess}</p>
+                    )}
+                    <div className="flex gap-3">
+                      <Button title="Cancel" variant="outline" onClick={handleCancelPasswordChange} />
+                      <Button title="Change Password" onClick={handleChangePassword} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-3">
+          {!isEditing ? (
+            <Button
+              title="Change"
+              onClick={() => setIsEditing(true)}
+              className="flex-1 bg-[var(--fn-primary)] text-white py-3 text-lg"
+            />
+          ) : (
+            <>
+              <Button title="Cancel" variant="outline" onClick={handleCancel} className="flex-1 py-3 text-lg" />
+              <Button
+                title="Save Change"
+                onClick={handleSave}
+                className="flex-1 bg-[var(--fn-primary)] text-white py-3 text-lg"
+              />
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

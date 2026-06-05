@@ -8,6 +8,7 @@ interface ProfilePictureUploadProps {
   onUpload: (imageDataUrl: string) => void;
   role?: Exclude<UserRole, 'admin'>;
   size?: 'sm' | 'md' | 'lg';
+  editable?: boolean;
 }
 
 export function ProfilePictureUpload({
@@ -15,6 +16,7 @@ export function ProfilePictureUpload({
   onUpload,
   role = 'athlete',
   size = 'md',
+  editable = true,
 }: ProfilePictureUploadProps) {
   const sizeClasses = {
     sm: 'h-16 w-16',
@@ -36,7 +38,7 @@ export function ProfilePictureUpload({
   const Icon = role === 'institution' ? Building2 : User;
 
   return (
-    <div className="group relative inline-block">
+    <div className={`${editable ? 'group' : ''} relative inline-block`}>
       {currentAvatar ? (
         <img
           src={currentAvatar}
@@ -53,15 +55,17 @@ export function ProfilePictureUpload({
           />
         </div>
       )}
-      <label className="absolute inset-0 flex cursor-pointer items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-        <Camera size={size === 'lg' ? 32 : size === 'md' ? 24 : 16} className="text-white" />
-        <input
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleFileChange}
-        />
-      </label>
+      {editable && (
+        <label className="absolute inset-0 flex cursor-pointer items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+          <Camera size={size === 'lg' ? 32 : size === 'md' ? 24 : 16} className="text-white" />
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+        </label>
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { AppProviders } from '@/components/providers';
+import { PageBackground } from '@/components/layout/PageBackground';
 
 import './globals.css';
 
@@ -13,7 +14,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
-        <AppProviders>{children}</AppProviders>
+        <AppProviders>
+          <PageBackground>{children}</PageBackground>
+        </AppProviders>
       </body>
     </html>
   );

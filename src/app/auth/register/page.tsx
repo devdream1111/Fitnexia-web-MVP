@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import { Logo } from '@/components/layout/Logo';
 import { RoleCard } from '@/components/role-card';
 import { ProfilePictureUpload } from '@/components/profile/ProfilePictureUpload';
+import { PhotoGallery } from '@/components/profile/PhotoGallery';
 import { Button } from '@/components/ui/button';
 import { FilterChip } from '@/components/ui/filter-chip';
 import { Input } from '@/components/ui/input';
@@ -31,6 +33,7 @@ export default function RegisterPage() {
   const [disciplines, setDisciplines] = useState<string[]>([]);
   const [institutionName, setInstitutionName] = useState('');
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
+  const [gallery, setGallery] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   const toggle = (list: string[], setList: (v: string[]) => void, item: string) => {
@@ -77,28 +80,28 @@ export default function RegisterPage() {
         </button>
 
         {step === 1 ? (
-          <div className="mt-8 text-center">
+          <div key="step1" className="mt-8 text-center animate-bounce-in">
             <div className="mb-4">
-              <img src="/fitnexia-logo.svg" alt="Fitnexia Logo" className="mx-auto h-14 w-auto" />
+              <Logo size="lg" className="mx-auto" />
             </div>
-            <h1 className="text-3xl font-extrabold md:text-4xl">{AUTH_LABELS.chooseProfile}</h1>
-            <p className="mt-3 text-lg text-[var(--fn-text-muted)]">{AUTH_LABELS.howWillYouUse}</p>
+            <h1 className="text-3xl font-extrabold md:text-4xl animate-slide-up stagger-1">{AUTH_LABELS.chooseProfile}</h1>
+            <p className="mt-3 text-lg text-[var(--fn-text-muted)] animate-slide-up stagger-2">{AUTH_LABELS.howWillYouUse}</p>
 
             {/* Horizontal role selection */}
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
+            <div className="mt-10 grid gap-4 md:grid-cols-3 animate-slide-up stagger-3">
               <RoleCard role="athlete" selected={role === 'athlete'} onPress={() => selectRole('athlete')} />
               <RoleCard role="instructor" selected={role === 'instructor'} onPress={() => selectRole('instructor')} />
               <RoleCard role="institution" selected={role === 'institution'} onPress={() => selectRole('institution')} />
             </div>
           </div>
         ) : (
-          <div className="mt-8">
+          <div key="step2" className="mt-8 animate-bounce-in">
             <div className="text-center">
-              <h1 className="text-3xl font-extrabold md:text-4xl">{AUTH_LABELS.createAccount}</h1>
-              <p className="mt-3 text-lg text-[var(--fn-text-muted)]">{AUTH_LABELS.completeProfile}</p>
+              <h1 className="text-3xl font-extrabold md:text-4xl animate-slide-up stagger-1">{AUTH_LABELS.createAccount}</h1>
+              <p className="mt-3 text-lg text-[var(--fn-text-muted)] animate-slide-up stagger-2">{AUTH_LABELS.completeProfile}</p>
             </div>
 
-            <div className="mt-10 rounded-2xl border border-[var(--fn-border)] bg-[var(--fn-surface)] p-6 md:p-8">
+            <div className="mt-10 rounded-2xl border border-[var(--fn-border)] bg-[var(--fn-surface)] p-6 md:p-8 animate-slide-up stagger-3">
               <div className="mb-6 flex justify-center">
                 <ProfilePictureUpload
                   currentAvatar={avatarUri}
@@ -108,12 +111,22 @@ export default function RegisterPage() {
                 />
               </div>
               {role === 'institution' ? (
-                <Input
-                  label={AUTH_LABELS.gymSchoolName}
-                  value={institutionName}
-                  onChange={(e) => setInstitutionName(e.target.value)}
-                  placeholder={AUTH_LABELS.gymSchoolPlaceholder}
-                />
+                <>
+                  <Input
+                    label={AUTH_LABELS.gymSchoolName}
+                    value={institutionName}
+                    onChange={(e) => setInstitutionName(e.target.value)}
+                    placeholder={AUTH_LABELS.gymSchoolPlaceholder}
+                  />
+                  <div className="mt-6">
+                    <p className="mb-3 text-base font-medium">Photo Gallery</p>
+                    <PhotoGallery
+                      images={gallery}
+                      onAddImage={(uri) => setGallery([...gallery, uri])}
+                      onRemoveImage={(idx) => setGallery(gallery.filter((_, i) => i !== idx))}
+                    />
+                  </div>
+                </>
               ) : null}
               <div className="grid gap-4 md:grid-cols-2">
                 <Input label={AUTH_LABELS.firstName} value={firstName} onChange={(e) => setFirstName(e.target.value)} />
@@ -156,12 +169,12 @@ export default function RegisterPage() {
                   </div>
                 </div>
               ) : null}
-              <Button title={BUTTON_LABELS.createAccount} loading={loading} onClick={submit} />
+              <Button title={BUTTON_LABELS.createAccount} loading={loading} onClick={submit} className="hover:animate-pulse-glow" />
             </div>
           </div>
         )}
 
-        <p className="mt-10 text-center text-base">
+        <p className="mt-10 text-center text-base animate-slide-up stagger-4">
           Already have an account?{' '}
           <Link href="/auth/login" className="font-semibold text-[var(--fn-primary)]">
             Sign in

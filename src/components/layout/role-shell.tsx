@@ -7,6 +7,7 @@ import {
   Home, Search, Calendar, User, BarChart3, BookOpen, DollarSign, Users, TrendingUp, LogOut, UserCircle, Settings, ChevronDown, Sun, Moon, Bell
 } from 'lucide-react';
 
+import { Logo } from './Logo';
 import { TAB_LABELS } from '@/constants/labels';
 import { useAuth } from '@/contexts/auth-context';
 import { useAppTheme } from '@/contexts/theme-context';
@@ -89,7 +90,7 @@ export function RoleShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-50 border-b border-[var(--fn-border)] bg-[var(--fn-surface)]">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
           <Link href="/" className="flex items-center">
-            <img src="/fitnexia-logo.svg" alt="Fitnexia Logo" className="h-12 w-auto" />
+            <Logo size="md" className="ml-[-31px]" />
           </Link>
 
           {/* Desktop Navigation */}

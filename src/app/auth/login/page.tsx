@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import { Logo } from '@/components/layout/Logo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/auth-context';
@@ -32,15 +33,14 @@ export default function LoginPage() {
   return (
     <div className="mx-auto flex min-h-screen flex-col justify-center px-6 py-12">
       <div className="mx-auto w-full max-w-md">
-        <div className="text-center">
-          <Link href="/" className="inline-block">
-            <img src="/fitnexia-logo.svg" alt="Fitnexia Logo" className="h-14 w-auto" />
+        <div className="text-center animate-bounce-in">
+          <Link href="/" className="inline-block mb-1">
+            <Logo size="lg" className="mx-auto" />
           </Link>
-          <h1 className="mt-8 text-3xl font-extrabold md:text-4xl">{AUTH_LABELS.welcomeBack}</h1>
-          <p className="mt-3 text-lg text-[var(--fn-text-muted)]">{AUTH_LABELS.signInSubtitle}</p>
+          
         </div>
 
-        <div className="mt-10 space-y-4">
+        <div className="mt-10 space-y-4 animate-slide-up stagger-1">
           <Input label={AUTH_LABELS.email} value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
           <Input
             label={AUTH_LABELS.password}
@@ -52,11 +52,16 @@ export default function LoginPage() {
           <Link href="/auth/forgot-password" className="text-sm font-medium text-[var(--fn-primary)]">
             Forgot password?
           </Link>
-          <Button title={BUTTON_LABELS.signIn} loading={loading} className="w-full" onClick={() => handleLogin()} />
+          <Button 
+            title={BUTTON_LABELS.signIn} 
+            loading={loading} 
+            className="w-full hover:animate-pulse-glow" 
+            onClick={() => handleLogin()} 
+          />
         </div>
 
         {googleSignIn ? (
-          <div className="mt-6">
+          <div className="mt-6 animate-slide-up stagger-2">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-[var(--fn-border)]" />
@@ -74,7 +79,7 @@ export default function LoginPage() {
           </div>
         ) : null}
 
-        <div className="mt-10">
+        <div className="mt-10 animate-slide-up stagger-3">
           <p className="text-center text-sm font-medium text-[var(--fn-text-muted)]">Quick demo (mock)</p>
           <div className="mt-4 grid grid-cols-3 gap-3">
             <Button title="Athlete" variant="outline" onClick={() => handleLogin('athlete')} />
@@ -83,7 +88,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="mt-10 text-center text-base">
+        <p className="mt-10 text-center text-base animate-slide-up stagger-4">
           New here?{' '}
           <Link href="/auth/register" className="font-semibold text-[var(--fn-primary)]">
             Create account

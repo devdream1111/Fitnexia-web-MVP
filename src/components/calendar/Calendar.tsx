@@ -7,12 +7,14 @@ import type { ClassListItem } from '@/types/api';
 
 interface CalendarProps {
   classes: ClassListItem[];
+  onDateClick?: (date: Date) => void;
+  showSidePanel?: boolean;
 }
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const FULL_DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export function Calendar({ classes }: CalendarProps) {
+export function Calendar({ classes, onDateClick, showSidePanel = true }: CalendarProps) {
   const [view, setView] = useState<'month' | 'week'>('month');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -22,6 +24,11 @@ export function Calendar({ classes }: CalendarProps) {
       const cDate = new Date(c.startAt);
       return cDate.toDateString() === date.toDateString();
     });
+  };
+
+  const handleDateClick = (date: Date) => {
+    setSelectedDate(date);
+    if (onDateClick) onDateClick(date);
   };
 
   const renderMonthView = () => {
@@ -46,7 +53,7 @@ export function Calendar({ classes }: CalendarProps) {
         <button
           type="button"
           key={i}
-          onClick={() => setSelectedDate(date)}
+          onClick={() => handleDateClick(date)}
           className={`relative aspect-square rounded-lg border bg-[var(--fn-surface)] p-2 text-left transition-all hover:border-[var(--fn-primary)] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[var(--fn-primary-muted)] ${
             isToday ? 'border-[var(--fn-primary)] ring-2 ring-[var(--fn-primary-muted)]' : 'border-[var(--fn-border)]'
           } ${isSelected ? 'border-[var(--fn-primary)] bg-[var(--fn-primary-muted)] shadow-md' : ''}`}
@@ -98,7 +105,7 @@ export function Calendar({ classes }: CalendarProps) {
               <div key={idx} className="flex-1">
                 <button
                   type="button"
-                  onClick={() => setSelectedDate(date)}
+                  onClick={() => handleDateClick(date)}
                   className={`h-12 w-full border-b border-[var(--fn-border)] px-2 text-center transition-all hover:bg-[var(--fn-surface-muted)] ${
                     isToday ? 'bg-[var(--fn-primary-muted)]' : ''
                   } ${isSelected ? 'bg-[var(--fn-primary-muted)]' : ''}`}
@@ -202,8 +209,8 @@ export function Calendar({ classes }: CalendarProps) {
         </button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 rounded-xl border border-[var(--fn-border)] bg-[var(--fn-surface)] p-4">
+      <div className={`grid gap-6 ${showSidePanel ? 'lg:grid-cols-3' : 'lg:grid-cols-1'}`}>
+        <div className={`${showSidePanel ? 'lg:col-span-2' : 'lg:col-span-1'} rounded-xl border border-[var(--fn-border)] bg-[var(--fn-surface)] p-4`}>
           {view === 'month' ? (
             <div className="grid grid-cols-7 gap-2">
               {DAYS.map((d) => (
@@ -216,7 +223,7 @@ export function Calendar({ classes }: CalendarProps) {
           )}
         </div>
 
-        {selectedDate && (
+        {showSidePanel && selectedDate && (
           <div className="rounded-xl border border-[var(--fn-border)] bg-[var(--fn-surface)] p-4">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-bold">

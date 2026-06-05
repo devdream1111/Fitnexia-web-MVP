@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { Calendar as CalendarIcon, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/calendar/Calendar';
 import { useClasses } from '@/contexts/classes-context';
 import { useBookings } from '@/contexts/bookings-context';
 import { useAuth } from '@/contexts/auth-context';
@@ -17,6 +19,8 @@ export default function BookingsPage() {
   const { user } = useAuth();
   const { addNotification } = useNotifications();
   const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming');
+  const [showCalendar, setShowCalendar] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [showCancelConfirm, setShowCancelConfirm] = useState<string | null>(null);
 
@@ -35,6 +39,12 @@ export default function BookingsPage() {
       })
       .filter((e): e is { booking: Booking; cls: ClassListItem } => e !== null);
   }, [list, getClassById]);
+
+  const bookedClasses = useMemo(() => {
+    return userBookings
+      .map((booking) => getClassById(booking.classId))
+      .filter((c): c is ClassListItem => c !== null);
+  }, [userBookings, getClassById]);
 
   const handleCancel = (bookingId: string) => {
     setShowCancelConfirm(bookingId);
@@ -63,18 +73,85 @@ export default function BookingsPage() {
     }, 500);
   };
 
+  const getBookingsForDate = (date: Date) => {
+    return entries.filter(({ cls }) => {
+      const clsDate = new Date(cls.startAt);
+      return clsDate.toDateString() === date.toDateString();
+    });
+  };
+
   return (
     <div>
-      <h1 className="mb-4 text-3xl font-extrabold">My Bookings</h1>
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-3xl font-extrabold">My Bookings</h1>
+        <button
+          type="button"
+          onClick={() => setShowCalendar(!showCalendar)}
+          className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
+            showCalendar 
+              ? 'bg-[var(--fn-primary)] text-white shadow-md' 
+              : 'bg-[var(--fn-surface)] text-[var(--fn-text-muted)] hover:bg-[var(--fn-surface-muted)] hover:text-[var(--fn-text)]'
+          }`}
+        >
+          <CalendarIcon size={16} />
+          {showCalendar ? 'Hide Calendar' : 'Show Calendar'}
+        </button>
+      </div>
+
+      {showCalendar && (
+        <div className="mb-8">
+          <Calendar 
+            classes={bookedClasses} 
+            onDateClick={(date) => setSelectedDate(date)}
+            showSidePanel={false}
+          />
+        </div>
+      )}
+
+      {/* Date Modal */}
+      {selectedDate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="max-w-lg w-full rounded-2xl bg-[var(--fn-surface)] p-6 shadow-xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold">
+                {selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setSelectedDate(null)}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--fn-surface-muted)] text-[var(--fn-text-muted)] transition-all hover:bg-[var(--fn-border)] hover:text-[var(--fn-text)]"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="space-y-3">
+              {getBookingsForDate(selectedDate).length === 0 ? (
+                <p className="text-sm text-[var(--fn-text-muted)]">No bookings for this day.</p>
+              ) : (
+                getBookingsForDate(selectedDate).map(({ booking, cls }) => (
+                  <div key={booking.id} className="rounded-lg border border-[var(--fn-border)] bg-[var(--fn-surface-muted)] p-4">
+                    <p className="font-semibold text-[var(--fn-text)]">{cls.title}</p>
+                    <p className="text-sm text-[var(--fn-text-muted)]">{formatClassDate(cls.startAt)}</p>
+                    <p className="text-sm text-[var(--fn-primary)]">{formatMoney(booking.price)}</p>
+                    <p className="text-xs text-[var(--fn-text-muted)] mt-1">Status: {booking.status}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-6 flex rounded-xl bg-[var(--fn-surface-muted)] p-1">
         {(['upcoming', 'past'] as const).map((t) => (
           <button
             key={t}
             type="button"
             onClick={() => setTab(t)}
-            className={`flex-1 rounded-lg py-2 text-sm font-semibold ${
+            className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${
               tab === t ? 'bg-[var(--fn-surface)] text-[var(--fn-text)] shadow-sm' : 'text-[var(--fn-text-muted)]'
-            }`}>
+            }`}
+          >
             {t === 'upcoming' ? 'Upcoming' : 'History'}
           </button>
         ))}
@@ -89,7 +166,8 @@ export default function BookingsPage() {
           return (
             <div
               key={booking.id}
-              className="mb-4 rounded-2xl border border-[var(--fn-border)] bg-[var(--fn-surface)] p-6">
+              className="mb-4 rounded-2xl border border-[var(--fn-border)] bg-[var(--fn-surface)] p-6"
+            >
               <div className="flex items-start justify-between">
                 <div>
                   <p className="font-bold text-lg">{cls.title}</p>
@@ -112,7 +190,7 @@ export default function BookingsPage() {
                 <div className="mt-4 p-4 rounded-xl border border-red-200 bg-red-50">
                   <p className="font-bold mb-2">Cancel Booking?</p>
                   <p className="text-sm mb-4">
-                    {canCancel 
+                    {canCancel
                       ? `You'll receive a full refund of ${formatMoney(refundAmount)}.`
                       : `You're within 24 hours of the class. You'll receive a 50% refund of ${formatMoney(refundAmount)}.`
                     }

@@ -3,7 +3,7 @@
 import { useAuth, DEFAULT_NOTIFICATIONS } from '@/contexts/auth-context';
 import { isNotificationPrefVisible } from '@/constants/features';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { ToggleButton } from '@/components/ui/toggle-button';
 import { BUTTON_LABELS } from '@/constants/labels';
 
 const PREFS: { key: keyof typeof DEFAULT_NOTIFICATIONS; label: string }[] = [
@@ -27,7 +27,7 @@ export function NotificationsForm() {
   return (
     <div className="space-y-3">
       {PREFS.filter((p) => isNotificationPrefVisible(p.key)).map((p) => (
-        <Checkbox
+        <ToggleButton
           key={p.key}
           label={p.label}
           checked={prefs[p.key]}

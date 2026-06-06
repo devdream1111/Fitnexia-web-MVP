@@ -31,6 +31,10 @@ export function Calendar({ classes, onDateClick, showSidePanel = true }: Calenda
     if (onDateClick) onDateClick(date);
   };
 
+  const goToToday = () => {
+    setCurrentDate(new Date());
+  };
+
   const renderMonthView = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -41,7 +45,7 @@ export function Calendar({ classes, onDateClick, showSidePanel = true }: Calenda
 
     const days = [];
     for (let i = 0; i < startPadding; i++) {
-      days.push(<div key={`pad-${i}`} className="aspect-square rounded-lg bg-[var(--fn-surface-muted)] opacity-30" />);
+      days.push(<div key={`pad-${i}`} className="aspect-[1] rounded-sm" />);
     }
     for (let i = 1; i <= daysInMonth; i++) {
       const date = new Date(year, month, i);
@@ -54,21 +58,23 @@ export function Calendar({ classes, onDateClick, showSidePanel = true }: Calenda
           type="button"
           key={i}
           onClick={() => handleDateClick(date)}
-          className={`relative aspect-square rounded-lg border bg-[var(--fn-surface)] p-2 text-left transition-all hover:border-[var(--fn-primary)] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[var(--fn-primary-muted)] ${
-            isToday ? 'border-[var(--fn-primary)] ring-2 ring-[var(--fn-primary-muted)]' : 'border-[var(--fn-border)]'
-          } ${isSelected ? 'border-[var(--fn-primary)] bg-[var(--fn-primary-muted)] shadow-md' : ''}`}
+          className={`relative aspect-[1] flex flex-col border border-transparent p-1 text-left transition-all hover:bg-[var(--fn-surface-muted)] ${
+            isSelected ? 'bg-[var(--fn-primary-muted)]' : ''
+          }`}
         >
-          <span className={`text-sm font-semibold ${isToday || isSelected ? 'text-[var(--fn-primary)]' : 'text-[var(--fn-text)]'}`}>{i}</span>
-          <div className="mt-1 space-y-1">
-            {dayClasses.slice(0, 2).map((c) => (
+          <span className={`flex h-7 w-7 items-center justify-center rounded-full text-sm font-medium transition-all ${
+            isToday ? 'bg-[var(--fn-primary)] text-white' : isSelected ? 'font-bold text-[var(--fn-primary)]' : 'text-[var(--fn-text)]'
+          }`}>{i}</span>
+          <div className="mt-1 flex-1 overflow-hidden">
+            {dayClasses.slice(0, 3).map((c) => (
               <div
                 key={c.id}
-                className="truncate rounded-md bg-[var(--fn-primary)] px-2 py-1 text-xs text-white"
+                className="mb-1 truncate rounded-sm bg-[var(--fn-primary)] px-1.5 py-0.5 text-[10px] text-white"
               >
                 {c.title}
               </div>
             ))}
-            {dayClasses.length > 2 && <div className="text-xs text-[var(--fn-text-muted)]">+{dayClasses.length - 2} more</div>}
+            {dayClasses.length > 3 && <div className="text-[10px] text-[var(--fn-text-muted)]">+{dayClasses.length - 3} more</div>}
           </div>
         </button>
       );
@@ -85,12 +91,12 @@ export function Calendar({ classes, onDateClick, showSidePanel = true }: Calenda
 
     return (
       <div className="overflow-x-auto">
-        <div className="flex min-w-[800px]">
-          <div className="w-20 flex-shrink-0">
+        <div className="flex min-w-[900px]">
+          <div className="w-24 flex-shrink-0">
             <div className="h-12"></div>
             {hours.map((hour) => (
-              <div key={hour} className="h-20 border-b border-[var(--fn-border)] px-2 text-xs text-[var(--fn-text-muted)]">
-                {hour === 0 ? '12am' : hour < 12 ? `${hour}am` : hour === 12 ? '12pm' : `${hour - 12}pm`}
+              <div key={hour} className="h-16 border-b border-[var(--fn-border)] px-2 text-right text-[11px] text-[var(--fn-text-muted)]">
+                {hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`}
               </div>
             ))}
           </div>
@@ -102,32 +108,34 @@ export function Calendar({ classes, onDateClick, showSidePanel = true }: Calenda
             const dayClasses = getClassesForDate(date);
 
             return (
-              <div key={idx} className="flex-1">
+              <div key={idx} className="flex-1 border-l border-[var(--fn-border)]">
                 <button
                   type="button"
                   onClick={() => handleDateClick(date)}
-                  className={`h-12 w-full border-b border-[var(--fn-border)] px-2 text-center transition-all hover:bg-[var(--fn-surface-muted)] ${
-                    isToday ? 'bg-[var(--fn-primary-muted)]' : ''
-                  } ${isSelected ? 'bg-[var(--fn-primary-muted)]' : ''}`}
+                  className={`flex h-12 w-full flex-col items-center justify-center border-b border-[var(--fn-border)] text-center transition-all hover:bg-[var(--fn-surface-muted)] ${
+                    isSelected ? 'bg-[var(--fn-primary-muted)]' : ''
+                  }`}
                 >
-                  <div className="text-xs text-[var(--fn-text-muted)]">{FULL_DAYS[idx]}</div>
-                  <div className={`text-sm font-semibold ${isToday || isSelected ? 'text-[var(--fn-primary)]' : ''}`}>{date.getDate()}</div>
+                  <div className="text-[11px] text-[var(--fn-text-muted)]">{FULL_DAYS[idx]}</div>
+                  <div className={`flex h-7 w-7 items-center justify-center rounded-full text-sm font-medium ${
+                    isToday ? 'bg-[var(--fn-primary)] text-white' : isSelected ? 'font-bold text-[var(--fn-primary)]' : ''
+                  }`}>{date.getDate()}</div>
                 </button>
                 <div className="relative">
                   {hours.map((hour) => (
-                    <div key={hour} className="h-20 border-b border-[var(--fn-border)]"></div>
+                    <div key={hour} className="h-16 border-b border-[var(--fn-border)]"></div>
                   ))}
                   {dayClasses.map((c) => {
                     const start = new Date(c.startAt);
-                    const top = start.getHours() * 80 + (start.getMinutes() * (80 / 60));
+                    const top = start.getHours() * 64 + (start.getMinutes() * (64 / 60));
                     const duration = 60; // Assume 1 hour for now
-                    const height = duration * (80 / 60);
+                    const height = duration * (64 / 60);
                     return (
                       <button
                         type="button"
                         key={c.id}
-                        className="absolute left-1 right-1 z-10 overflow-hidden rounded-lg border border-[var(--fn-primary)] bg-[var(--fn-primary-muted)] p-2 text-left text-xs shadow-md transition-all hover:scale-105 hover:shadow-lg"
-                        style={{ top, height: Math.max(height, 60) }}
+                        className="absolute left-1 right-1 z-10 overflow-hidden rounded-md border-l-4 border-[var(--fn-primary)] bg-[var(--fn-primary-muted)] px-2 py-1 text-left text-[11px] shadow-sm transition-all hover:shadow-md"
+                        style={{ top, height: Math.max(height, 48) }}
                       >
                         <div className="font-semibold text-[var(--fn-primary)]">{c.title}</div>
                         <div className="text-[var(--fn-primary-text)]">{formatClassDate(c.startAt)}</div>
@@ -158,14 +166,46 @@ export function Calendar({ classes, onDateClick, showSidePanel = true }: Calenda
   const selectedClasses = selectedDate ? getClassesForDate(selectedDate) : [];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-center gap-4">
+    <div className="space-y-4">
+      {/* Google Calendar-style header */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--fn-border)] pb-4">
         <div className="flex items-center gap-2">
           <button
             type="button"
+            onClick={goToToday}
+            className="rounded-md border border-[var(--fn-border)] bg-[var(--fn-surface)] px-4 py-2 text-sm font-medium text-[var(--fn-text)] transition-all hover:bg-[var(--fn-surface-muted)]"
+          >
+            Today
+          </button>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => (view === 'month' ? navigateMonth(-1) : navigateWeek(-1))}
+              className="flex h-9 w-9 items-center justify-center rounded-full text-[var(--fn-text-muted)] transition-all hover:bg-[var(--fn-surface-muted)] hover:text-[var(--fn-text)]"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              type="button"
+              onClick={() => (view === 'month' ? navigateMonth(1) : navigateWeek(1))}
+              className="flex h-9 w-9 items-center justify-center rounded-full text-[var(--fn-text-muted)] transition-all hover:bg-[var(--fn-surface-muted)] hover:text-[var(--fn-text)]"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+          <h2 className="ml-2 text-xl font-semibold">
+            {view === 'month'
+              ? currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+              : `${new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay() + 6).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
+          </h2>
+        </div>
+
+        <div className="flex items-center gap-2 rounded-lg bg-[var(--fn-surface-muted)] p-1">
+          <button
+            type="button"
             onClick={() => setView('month')}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
-              view === 'month' ? 'bg-[var(--fn-primary)] text-white shadow-md' : 'bg-[var(--fn-surface)] text-[var(--fn-text-muted)] hover:bg-[var(--fn-surface-muted)]'
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
+              view === 'month' ? 'bg-white text-[var(--fn-text)] shadow-sm' : 'text-[var(--fn-text-muted)] hover:text-[var(--fn-text)]'
             }`}
           >
             <CalendarIcon size={16} />
@@ -174,8 +214,8 @@ export function Calendar({ classes, onDateClick, showSidePanel = true }: Calenda
           <button
             type="button"
             onClick={() => setView('week')}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
-              view === 'week' ? 'bg-[var(--fn-primary)] text-white shadow-md' : 'bg-[var(--fn-surface)] text-[var(--fn-text-muted)] hover:bg-[var(--fn-surface-muted)]'
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
+              view === 'week' ? 'bg-white text-[var(--fn-text)] shadow-sm' : 'text-[var(--fn-text-muted)] hover:text-[var(--fn-text)]'
             }`}
           >
             <Clock size={16} />
@@ -184,35 +224,18 @@ export function Calendar({ classes, onDateClick, showSidePanel = true }: Calenda
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => (view === 'month' ? navigateMonth(-1) : navigateWeek(-1))}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--fn-surface)] text-[var(--fn-text-muted)] transition-all hover:bg-[var(--fn-surface-muted)] hover:text-[var(--fn-text)]"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <h2 className="text-xl font-bold">
-          {view === 'month'
-            ? currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-            : `${new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay() + 6).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
-        </h2>
-        <button
-          type="button"
-          onClick={() => (view === 'month' ? navigateMonth(1) : navigateWeek(1))}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--fn-surface)] text-[var(--fn-text-muted)] transition-all hover:bg-[var(--fn-surface-muted)] hover:text-[var(--fn-text)]"
-        >
-          <ChevronRight size={20} />
-        </button>
-      </div>
-
       <div className={`grid gap-6 ${showSidePanel ? 'lg:grid-cols-3' : 'lg:grid-cols-1'}`}>
         <div className={`${showSidePanel ? 'lg:col-span-2' : 'lg:col-span-1'} rounded-xl border border-[var(--fn-border)] bg-[var(--fn-surface)] p-4`}>
           {view === 'month' ? (
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-7 border-b border-[var(--fn-border)]">
               {DAYS.map((d) => (
-                <div key={d} className="pb-2 text-center text-sm font-semibold text-[var(--fn-text-muted)]">{d}</div>
+                <div key={d} className="pb-2 text-center text-sm font-medium text-[var(--fn-text-muted)]">{d}</div>
               ))}
+            </div>
+          ) : null}
+          
+          {view === 'month' ? (
+            <div className="grid grid-cols-7 border-x border-b border-[var(--fn-border)]">
               {renderMonthView()}
             </div>
           ) : (
@@ -221,15 +244,15 @@ export function Calendar({ classes, onDateClick, showSidePanel = true }: Calenda
         </div>
 
         {showSidePanel && selectedDate && (
-          <div className="rounded-xl border border-[var(--fn-border)] bg-[var(--fn-surface)] p-4">
+          <div className="rounded-xl border border-[var(--fn-border)] bg-[var(--fn-surface)] p-6">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-bold">
+              <h3 className="text-lg font-semibold">
                 {selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
               </h3>
               <button
                 type="button"
                 onClick={() => setSelectedDate(null)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--fn-surface-muted)] text-[var(--fn-text-muted)] transition-all hover:bg-[var(--fn-border)] hover:text-[var(--fn-text)]"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--fn-text-muted)] transition-all hover:bg-[var(--fn-surface-muted)] hover:text-[var(--fn-text)]"
               >
                 <X size={16} />
               </button>
@@ -239,10 +262,10 @@ export function Calendar({ classes, onDateClick, showSidePanel = true }: Calenda
             ) : (
               <div className="space-y-3">
                 {selectedClasses.map((c) => (
-                  <div key={c.id} className="rounded-lg border border-[var(--fn-border)] bg-[var(--fn-surface-muted)] p-3">
+                  <div key={c.id} className="rounded-lg border border-[var(--fn-border)] bg-[var(--fn-surface-muted)] p-4">
                     <p className="font-semibold text-[var(--fn-text)]">{c.title}</p>
                     <p className="text-sm text-[var(--fn-text-muted)]">{formatClassDate(c.startAt)}</p>
-                    <p className="text-sm text-[var(--fn-primary)]">{formatMoney(c.price)}</p>
+                    <p className="text-sm text-[var(--fn-primary)] font-medium">{formatMoney(c.price)}</p>
                   </div>
                 ))}
               </div>

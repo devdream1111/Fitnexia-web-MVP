@@ -123,7 +123,7 @@ export function RoleShell({ children }: { children: React.ReactNode }) {
             >
               <Bell size={18} />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--fn-primary)] text-[var(--fn-primary-text)] text-xs font-semibold">
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--fn-primary)] text-[var(--fn-primary-text)] text-xs font-semibold" style={{color:"white"}}>
                   {unreadCount}
                 </span>
               )}
